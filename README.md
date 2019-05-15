@@ -1,4 +1,4 @@
-# scynchro
+# Scynchro
 
 > video synchronize application
 

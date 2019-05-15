@@ -20,7 +20,7 @@
           <p>
             Find a bug? Report it on the github
             <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
+              href="https://github.com/ymdi/Scynchro/issues"
               target="_blank"
               title="contribute"
               >issue board</a

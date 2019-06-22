@@ -1,12 +1,10 @@
 <template>
   <v-app light>
-    <v-toolbar fixed app>
+    <v-toolbar fixed app clipped-left>
       <v-toolbar-title v-text="title" />
     </v-toolbar>
     <v-content>
-      <v-container>
-        <nuxt />
-      </v-container>
+      <nuxt />
     </v-content>
   </v-app>
 </template>

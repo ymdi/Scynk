@@ -1,4 +1,13 @@
+html {
+  overflow: hidden !important;
+}
 textarea {
   margin-top:0 !important;
   font-size:90% !important;
+}
+input {
+  font-size: 90% !important;
+}
+.urlinput .v-input__control, .urlinput .v-input__slot{
+  min-height: 36px !important;
 }

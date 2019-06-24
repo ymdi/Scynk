@@ -1,6 +1,6 @@
 # Scynchro
 
-> video synchronize application
+> application for watch video and chat with friends
 
 ## Build Setup
 

@@ -2,6 +2,81 @@
   <v-container>
     <v-layout column wrap>
       <v-navigation-drawer fixed clipped app expand-on-hover width="300px" :mini-variant.sync="mini">
+        <v-layout column fill-height>
+          <v-layout row align-center>
+            <span class="subheading my-2 ml-3">Now Playing</span>
+            <v-btn icon disabled style="visibility: hidden;">
+              <v-icon></v-icon>
+            </v-btn>
+          </v-layout>
+          <v-divider></v-divider>
+          <v-flex my-2>
+            <v-list two-line dense>
+              <v-list-tile>
+                <v-list-tile-content>
+                  <v-list-tile-title>
+                    <v-layout row align-center>
+                      <v-icon size="13" color="#FF0000">fab fa-youtube</v-icon>
+                      <span class="ml-2 text-truncate">
+                        SIRUP - LOOP (Official Music Video)
+                      </span>
+                    </v-layout>
+                  </v-list-tile-title>
+                  <v-list-tile-sub-title>12:34</v-list-tile-sub-title>
+                </v-list-tile-content>
+                <v-list-tile-action style="width: 20px;min-width: 30px !important;">
+                  <v-flex></v-flex>
+                  <v-list-tile-action-text>
+                    added by user1
+                  </v-list-tile-action-text>
+                </v-list-tile-action>
+              </v-list-tile>
+            </v-list>
+          </v-flex>
+          <v-divider></v-divider>
+          <v-layout row align-center pl-2 py-1>
+            <v-text-field
+              v-model="videoURL"
+              solo
+              hide-details
+              label="Video URL"
+              class="urlinput"
+              @keyup.enter="addVideo(videoURL)"
+            ></v-text-field>
+            <v-btn color="primary" style="min-width: 0px;" @click="addVideo(videoURL)">
+              <v-icon color="white">playlist_add</v-icon>
+            </v-btn>
+          </v-layout>
+          <v-divider></v-divider>
+          <v-flex id="video-queue" xs12 pa-1 ma-1 style="overflow-y: auto;">
+            <v-list two-line dense>
+              <template v-for="(video, index) in videoQueue">
+                <v-list-tile :key="index">
+                  <v-list-tile-content>
+                    <v-list-tile-title>
+                      <v-layout row align-center>
+                        <v-icon v-if="index % 2 == 0" size="13" color="#FF0000">fab fa-youtube</v-icon>
+                        <v-icon v-else size="13" color="#6441A4">fab fa-twitch</v-icon>
+                        <span class="ml-2 text-truncate">
+                          SIRUP - LOOP (Official Music Video)
+                        </span>
+                      </v-layout>
+                    </v-list-tile-title>
+                    <v-list-tile-sub-title>12:34</v-list-tile-sub-title>
+                  </v-list-tile-content>
+                  <v-list-tile-action style="width: 20px;min-width: 30px !important;">
+                    <v-flex></v-flex>
+                    <v-list-tile-action-text>
+                      added by user{{ index + 1 }}&nbsp;
+                      <v-icon size="15" color="primary" @click="removeVideo(index)">fas fa-trash-alt</v-icon>
+                    </v-list-tile-action-text>
+                  </v-list-tile-action>
+                </v-list-tile>
+                <v-divider v-if="index < videoQueue.length - 1" :key="video" class="pb-2"></v-divider>
+              </template>
+            </v-list>
+          </v-flex>
+        </v-layout>
       </v-navigation-drawer>
       <v-navigation-drawer fixed clipped app right permanent width="350px">
         <v-layout column fill-height>
@@ -32,8 +107,8 @@
             </v-menu>
           </v-layout>
           <v-divider></v-divider>
-          <v-flex id="chatarea" xs12 pa-1 ma-1 style="overflow-y: scroll">
-            <div v-for="mess in messages" :key="mess.date" class="px-1">
+          <v-flex id="chat-area" xs12 pa-1 ma-1 style="overflow-y: auto;">
+            <div v-for="(mess, index) in messages" :key="index" class="px-1">
               <p>
                 <strong>{{ mess.user.name }}</strong
                 >:
@@ -42,26 +117,20 @@
             </div>
           </v-flex>
           <v-divider></v-divider>
-          <v-layout column pt-1 px-1 pb-4 ma-2>
-            <v-flex xs12>
-              <v-textarea
-                v-model="message"
-                placeholder="message"
-                solo
-                no-resize
-                rows="3"
-                hide-details
-                @keyup.enter="sendMessage"
-              ></v-textarea>
+          <v-layout column justify-end xs12 ma-2>
+            <v-textarea
+              v-model="message"
+              placeholder="message"
+              solo
+              no-resize
+              rows="3"
+              hide-details
+              @keyup.enter="sendMessage"
+            ></v-textarea>
+            <v-flex text-xs-right pt-1>
+              <span class="body-1" :style="message.length > 200 ? 'color: red;' : ''">{{ message.length }}/200</span>
+              <v-btn small color="primary" :disabled="message.length > 200" @click="sendMessage">Send</v-btn>
             </v-flex>
-            <v-layout>
-              <v-flex text-xs-right>
-                <span class="body-1" :style="message.length > 200 ? 'color: red;' : ''">
-                  {{ message.length }}/200
-                </span>
-                <v-btn small color="primary" :disabled="message.length > 200" @click="sendMessage">Send</v-btn>
-              </v-flex>
-            </v-layout>
           </v-layout>
         </v-layout>
       </v-navigation-drawer>
@@ -73,14 +142,14 @@
             </div>
             <div class="caption pa-1 ma-1">added by user1</div> -->
             <v-responsive :aspect-ratio="16 / 9" class="pa-1 ma-1">
-              <!-- <iframe
+              <iframe
                 width="100%"
                 height="100%"
                 src="https://www.youtube.com/embed/ZFqGCyitrsQ"
                 frameborder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
-              ></iframe> -->
+              ></iframe>
             </v-responsive>
           </v-flex>
         </v-layout>
@@ -104,7 +173,9 @@ export default {
       message: '',
       messages: [],
       isLoading: true,
-      mini: false
+      mini: false,
+      videoQueue: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
+      videoURL: ''
     }
   },
   mounted() {
@@ -123,12 +194,11 @@ export default {
 
     this.socket.on('new-message', message => {
       this.messages.push(message || {})
-      this.chatScroll()
     })
 
     setTimeout(() => {
       this.isLoading = false
-      this.chatScroll()
+      this.scrollChat('initial')
     }, 1000)
   },
   methods: {
@@ -151,15 +221,29 @@ export default {
       this.messages.push(message)
       // サーバー側にメッセージを送信する
       this.socket.emit('send-message', message)
-      this.chatScroll()
+      this.scrollChat()
       // input要素を空にする
       this.message = ''
     },
-    chatScroll: function() {
+    scrollChat: function(flag = '') {
       this.$nextTick(() => {
-        const obj = document.getElementById('chatarea')
-        obj.scrollTop = obj.scrollHeight
+        const obj = document.getElementById('chat-area')
+        const scrolledRate = (Math.abs(obj.scrollHeight - obj.scrollTop - obj.clientHeight) / obj.scrollHeight) * 100
+        if (scrolledRate < 15 || flag === 'initial') {
+          obj.scrollTop = obj.scrollHeight
+        }
+        return 0
       })
+    },
+    addVideo: function(url) {
+      if (!url.trim()) {
+        return
+      }
+      console.log(url)
+      this.videoURL = ''
+    },
+    removeVideo: function(index) {
+      console.log(index)
     }
   }
 }

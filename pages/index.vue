@@ -9,10 +9,14 @@
           <v-card-text>
             <v-form>
               <v-text-field v-model="name" :rules="[rules.required]" label="Name"></v-text-field>
-              <v-text-field v-model="roomId" label="Room ID(default : 1)" @keyup.enter="joinRoom"></v-text-field>
-              <v-btn block color="primary" @click="joinRoom">Enter</v-btn>
+              <v-text-field v-model="roomId" label="Room ID(default : 1)" @keyup.enter="enterRoom"></v-text-field>
+              <v-btn block color="primary" @click="enterRoom">Enter</v-btn>
             </v-form>
             <hr class="my-3" />
+            <p>
+              アドバイス、ご意見、ご要望はこちらまで！
+              <a href="https://twitter.com/sababread" target="_blank" title="contribute">Twitter</a>.
+            </p>
             <p>
               バグ報告はこちらまで！
               <a href="https://github.com/ymdi/Scynchro/issues" target="_blank" title="contribute">issue board</a>.
@@ -38,7 +42,7 @@ export default {
     }
   },
   methods: {
-    joinRoom: function() {
+    enterRoom: function() {
       if (!this.roomId) {
         this.roomId = 1
       }

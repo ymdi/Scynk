@@ -203,7 +203,7 @@ export default {
   },
   methods: {
     sendMessage() {
-      if (!this.message.trim() || this.message.length > 200) {
+      if (!this.message.trim() || this.message.trim().length > 200) {
         return
       }
       const now = new Date().toLocaleString('ja-JP')

@@ -69,8 +69,10 @@ async function start() {
     })
 
     socket.on('send-message', message => {
-      roomList[roomId].messages.push(message)
-      socket.broadcast.to(roomId).emit('new-message', message)
+      if(message.length <= 200){
+        roomList[roomId].messages.push(message)
+        socket.broadcast.to(roomId).emit('new-message', message)
+      }
     })
 
     socket.on('disconnect', () => {

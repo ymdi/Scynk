@@ -145,7 +145,7 @@
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/ZFqGCyitrsQ"
+                src="https://www.youtube.com/embed/mHrjM6oVez0"
                 frameborder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
@@ -167,7 +167,7 @@ export default {
       socket: '',
       room: {
         id: this.$nuxt.$route.params.roomId,
-        name: 'test'
+        name: this.$store.state.user
       },
       users: [],
       message: '',

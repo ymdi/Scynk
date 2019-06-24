@@ -7,10 +7,10 @@
         <v-card>
           <v-card-title class="headline">ルームに入る</v-card-title>
           <v-card-text>
-            <v-form v-model="valid">
-              <v-text-field v-model="name" label="Name"></v-text-field>
-              <v-text-field v-model="roomId" label="Room ID(default : 1)"></v-text-field>
-              <v-btn block color="primary">Enter</v-btn>
+            <v-form>
+              <v-text-field v-model="name" :rules="[rules.required]" label="Name"></v-text-field>
+              <v-text-field v-model="roomId" label="Room ID(default : 1)" @keyup.enter="joinRoom"></v-text-field>
+              <v-btn block color="primary" @click="joinRoom">Enter</v-btn>
             </v-form>
             <hr class="my-3" />
             <p>
@@ -30,9 +30,20 @@ export default {
   components: {},
   data() {
     return {
-      valid: false,
       name: '',
-      roomId: ''
+      roomId: '',
+      rules: {
+        required: value => !!value || 'Required.'
+      }
+    }
+  },
+  methods: {
+    joinRoom: function() {
+      if (!this.roomId) {
+        this.roomId = 1
+      }
+      this.$store.commit('name', this.name)
+      this.$router.push(`/${this.roomId}`)
     }
   }
 }

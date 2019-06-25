@@ -8,12 +8,10 @@
           <v-card-text>
             <v-layout>
               <v-flex xs12>
-                <v-form>
-                  <v-text-field v-model="room.name" label="Name" @keyup.enter="joinRoom"></v-text-field>
-                  <v-btn block :disabled="room.name === null || !room.name.trim()" color="primary" @click="joinRoom">
-                    Enter
-                  </v-btn>
-                </v-form>
+                <v-text-field v-model="room.name" label="Name" @keyup.enter="joinRoom"></v-text-field>
+                <v-btn block :disabled="room.name === null || !room.name.trim()" color="primary" @click="joinRoom">
+                  Enter
+                </v-btn>
               </v-flex>
             </v-layout>
           </v-card-text>
@@ -215,10 +213,6 @@ export default {
     if (this.room.name !== null) {
       this.joinRoom()
     }
-    setTimeout(() => {
-      this.isLoading = false
-      this.scrollChat('initial')
-    }, 1000)
   },
   methods: {
     joinRoom() {
@@ -239,9 +233,15 @@ export default {
 
       this.socket.on('new-message', message => {
         this.messages.push(message || {})
+        this.scrollChat()
       })
 
       this.dialog = false
+
+      setTimeout(() => {
+        this.isLoading = false
+        this.scrollChat('initial')
+      }, 1000)
     },
     sendMessage() {
       if (!this.message.trim() || this.message.trim().length > 200) {

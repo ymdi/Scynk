@@ -1,6 +1,26 @@
 <template>
   <v-container>
     <v-layout column wrap>
+      <!-- <template v-if="$store.state.user === null"> -->
+      <v-dialog v-model="dialog" persistent max-width="600px">
+        <v-card>
+          <v-card-title>Enter Name</v-card-title>
+          <v-card-text>
+            <v-layout>
+              <v-flex xs12>
+                <v-form>
+                  <v-text-field v-model="room.name" label="Name" @keyup.enter="joinRoom"></v-text-field>
+                  <v-btn block :disabled="room.name === null || !room.name.trim()" color="primary" @click="joinRoom">
+                    Enter
+                  </v-btn>
+                </v-form>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+      <!-- </template> -->
+      <!-- left drawer -->
       <v-navigation-drawer fixed clipped app expand-on-hover width="300px" :mini-variant.sync="mini">
         <v-layout column fill-height>
           <v-layout row align-center>
@@ -67,7 +87,7 @@
                   <v-list-tile-action style="width: 20px;min-width: 30px !important;">
                     <v-flex></v-flex>
                     <v-list-tile-action-text>
-                      added by user{{ index + 1 }}&nbsp;
+                      <span class="pr-1">added by user{{ index + 1 }}</span>
                       <v-icon size="15" color="primary" @click="removeVideo(index)">fas fa-trash-alt</v-icon>
                     </v-list-tile-action-text>
                   </v-list-tile-action>
@@ -78,6 +98,8 @@
           </v-flex>
         </v-layout>
       </v-navigation-drawer>
+      <!-- left drawer -->
+      <!-- right drawer -->
       <v-navigation-drawer fixed clipped app right permanent width="350px">
         <v-layout column fill-height>
           <v-layout row align-center>
@@ -134,6 +156,8 @@
           </v-layout>
         </v-layout>
       </v-navigation-drawer>
+      <!-- right drawer -->
+      <!-- player area -->
       <v-flex xs12>
         <v-layout row>
           <v-flex style="width:calc(100% - 360px);//border:1px solid black;">
@@ -154,6 +178,7 @@
           </v-flex>
         </v-layout>
       </v-flex>
+      <!-- player area -->
     </v-layout>
   </v-container>
 </template>
@@ -164,6 +189,7 @@ export default {
   layout: 'layout',
   data() {
     return {
+      dialog: false,
       socket: '',
       room: {
         id: this.$nuxt.$route.params.roomId,
@@ -178,30 +204,45 @@ export default {
       videoURL: ''
     }
   },
+  created() {
+    if (this.$store.state.user === null) {
+      this.dialog = true
+    }
+  },
   mounted() {
     this.socket = io()
 
-    this.socket.emit('join-room', this.room)
-
-    this.socket.on('new-user', user => {
-      this.users.push(user || '')
-    })
-
-    this.socket.on('user-left', user => {
-      const index = this.users.findIndex(elm => elm.id === user.id)
-      this.users.splice(index, 1)
-    })
-
-    this.socket.on('new-message', message => {
-      this.messages.push(message || {})
-    })
-
+    if (this.room.name !== null) {
+      this.joinRoom()
+    }
     setTimeout(() => {
       this.isLoading = false
       this.scrollChat('initial')
     }, 1000)
   },
   methods: {
+    joinRoom() {
+      if (this.room.name === null || !this.room.name.trim()) {
+        return
+      }
+
+      this.socket.emit('join-room', this.room)
+
+      this.socket.on('new-user', user => {
+        this.users.push(user || '')
+      })
+
+      this.socket.on('user-left', user => {
+        const index = this.users.findIndex(elm => elm.id === user.id)
+        this.users.splice(index, 1)
+      })
+
+      this.socket.on('new-message', message => {
+        this.messages.push(message || {})
+      })
+
+      this.dialog = false
+    },
     sendMessage() {
       if (!this.message.trim() || this.message.trim().length > 200) {
         return
@@ -225,7 +266,7 @@ export default {
       // input要素を空にする
       this.message = ''
     },
-    scrollChat: function(flag = '') {
+    scrollChat(flag = '') {
       this.$nextTick(() => {
         const obj = document.getElementById('chat-area')
         const scrolledRate = (Math.abs(obj.scrollHeight - obj.scrollTop - obj.clientHeight) / obj.scrollHeight) * 100
@@ -235,14 +276,14 @@ export default {
         return 0
       })
     },
-    addVideo: function(url) {
+    addVideo(url) {
       if (!url.trim()) {
         return
       }
       console.log(url)
       this.videoURL = ''
     },
-    removeVideo: function(index) {
+    removeVideo(index) {
       console.log(index)
     }
   }

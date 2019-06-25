@@ -69,7 +69,7 @@ async function start() {
     })
 
     socket.on('send-message', message => {
-      if(message.length <= 200){
+      if(message.text.length <= 200){
         roomList[roomId].messages.push(message)
         socket.broadcast.to(roomId).emit('new-message', message)
       }

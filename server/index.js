@@ -2,6 +2,11 @@ const express = require('express')
 const consola = require('consola')
 const { Nuxt, Builder } = require('nuxt')
 const app = express()
+const axios = require('axios')
+const moment = require('moment')
+const momentDurationFormatSetup = require("moment-duration-format")
+
+require('dotenv').config()
 
 // Import and Set Nuxt.js options
 const config = require('../nuxt.config.js')
@@ -48,7 +53,9 @@ async function start() {
       if(!roomList[roomId]){
         roomList[roomId] = {
           'users': [],
-          'messages': []
+          'messages': [],
+          'videoQueue': [],
+          'currentVideo': {}
         }
       }
       const currentRoom = roomList[roomId]
@@ -63,6 +70,17 @@ async function start() {
             socket.emit('new-message', message)
           })
         }
+        if (currentRoom.videoQueue.length > 0) {
+          currentRoom.videoQueue.forEach(video => {
+            socket.emit('new-video', video)
+          })
+        }
+        if (currentRoom.currentVideo.title !== undefined) {
+          socket.emit('current-video', {
+            video: currentRoom.currentVideo,
+            index: null
+          })
+        }
         console.log(`id: ${socket.id} is joined to ${roomId}`)
         socket.broadcast.to(roomId).emit('new-user', userData)
       })
@@ -73,6 +91,47 @@ async function start() {
         roomList[roomId].messages.push(message)
         socket.broadcast.to(roomId).emit('new-message', message)
       }
+    })
+
+    socket.on('add-video', video => {
+      const id = video.url.match(/(?<=\?v=).*?(?=&|$)/)
+      const obj = {
+        id: id !== null ? id[0] : '',
+        type: ''
+      }
+
+      const getData = async (obj) => {
+        return await axios.get('https://www.googleapis.com/youtube/v3/videos',{
+          params:{
+            id: obj.id,
+            key: process.env.Youtube_API_KEY,
+            part: 'snippet, contentDetails',
+            fields: 'items(snippet(title),contentDetails(duration))'
+          }
+        })
+      }
+
+      getData(obj).then((res) => {
+        const data = res.data.items[0]
+        video.title = data.snippet.title
+        video.duration = moment.duration(data.contentDetails.duration).format('hh:mm:ss')
+        video.videoId = obj.id
+        video.icon = 'fab fa-youtube'
+        
+        roomList[roomId].videoQueue.push(video)
+        io.in(roomId).emit('new-video', video)
+      }).catch(err => console.log(err))
+    })
+
+    socket.on('next-video', index => {
+      const currentRoom = roomList[roomId]
+      const currentVideo = currentRoom.videoQueue[index]
+      currentRoom.currentVideo = currentVideo
+      currentRoom.videoQueue.splice(index, 1)
+      io.in(roomId).emit('current-video', {
+        video: currentVideo,
+        index: index
+      })
     })
 
     socket.on('disconnect', () => {

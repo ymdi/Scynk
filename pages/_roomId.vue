@@ -34,18 +34,18 @@
                 <v-list-tile-content>
                   <v-list-tile-title>
                     <v-layout row align-center>
-                      <v-icon size="13" color="#FF0000">fab fa-youtube</v-icon>
+                      <v-icon size="13" color="#FF0000">{{ currentVideo.icon }}</v-icon>
                       <span class="ml-2 text-truncate">
-                        SIRUP - LOOP (Official Music Video)
+                        {{ currentVideo.title }}
                       </span>
                     </v-layout>
                   </v-list-tile-title>
-                  <v-list-tile-sub-title>12:34</v-list-tile-sub-title>
+                  <v-list-tile-sub-title>{{ currentVideo.duration }}</v-list-tile-sub-title>
                 </v-list-tile-content>
                 <v-list-tile-action style="width: 20px;min-width: 30px !important;">
                   <v-flex></v-flex>
-                  <v-list-tile-action-text>
-                    added by user1
+                  <v-list-tile-action-text v-if="currentVideo.user.name !== ''">
+                    added by {{ currentVideo.user.name }}
                   </v-list-tile-action-text>
                 </v-list-tile-action>
               </v-list-tile>
@@ -59,9 +59,9 @@
               hide-details
               label="Video URL"
               class="urlinput"
-              @keyup.enter="addVideo(videoURL)"
+              @keyup.enter="addVideo"
             ></v-text-field>
-            <v-btn color="primary" style="min-width: 0px;" @click="addVideo(videoURL)">
+            <v-btn color="primary" style="min-width: 0px;" @click="addVideo">
               <v-icon color="white">playlist_add</v-icon>
             </v-btn>
           </v-layout>
@@ -69,28 +69,33 @@
           <v-flex id="video-queue" xs12 pa-1 ma-1 style="overflow-y: auto;">
             <v-list two-line dense>
               <template v-for="(video, index) in videoQueue">
-                <v-list-tile :key="index">
-                  <v-list-tile-content>
-                    <v-list-tile-title>
-                      <v-layout row align-center>
-                        <v-icon v-if="index % 2 == 0" size="13" color="#FF0000">fab fa-youtube</v-icon>
-                        <v-icon v-else size="13" color="#6441A4">fab fa-twitch</v-icon>
-                        <span class="ml-2 text-truncate">
-                          SIRUP - LOOP (Official Music Video)
-                        </span>
-                      </v-layout>
-                    </v-list-tile-title>
-                    <v-list-tile-sub-title>12:34</v-list-tile-sub-title>
-                  </v-list-tile-content>
-                  <v-list-tile-action style="width: 20px;min-width: 30px !important;">
-                    <v-flex></v-flex>
-                    <v-list-tile-action-text>
-                      <span class="pr-1">added by user{{ index + 1 }}</span>
-                      <v-icon size="15" color="primary" @click="removeVideo(index)">fas fa-trash-alt</v-icon>
-                    </v-list-tile-action-text>
-                  </v-list-tile-action>
-                </v-list-tile>
-                <v-divider v-if="index < videoQueue.length - 1" :key="video" class="pb-2"></v-divider>
+                <div :key="index">
+                  <v-list-tile>
+                    <v-list-tile-content>
+                      <v-list-tile-title>
+                        <v-layout row align-center>
+                          <!-- <v-icon v-if="index % 2 == 0" size="13" color="#FF0000">fab fa-youtube</v-icon>
+                          <v-icon v-else size="13" color="#6441A4">fab fa-twitch</v-icon> -->
+                          <v-icon size="13" color="#FF0000">{{ video.icon }}</v-icon>
+                          <a class="video-queue-title" @click="nextVideo(index)">
+                            <span class="ml-2 text-truncate">
+                              {{ video.title }}
+                            </span>
+                          </a>
+                        </v-layout>
+                      </v-list-tile-title>
+                      <v-list-tile-sub-title>{{ video.duration }}</v-list-tile-sub-title>
+                    </v-list-tile-content>
+                    <v-list-tile-action style="width: 20px;min-width: 30px !important;">
+                      <v-flex></v-flex>
+                      <v-list-tile-action-text>
+                        <span class="pr-1">added by {{ video.user.name }}</span>
+                        <v-icon size="15" color="primary" @click="removeVideo(index)">fas fa-trash-alt</v-icon>
+                      </v-list-tile-action-text>
+                    </v-list-tile-action>
+                  </v-list-tile>
+                  <v-divider v-if="index < videoQueue.length - 1" class="pb-2"></v-divider>
+                </div>
               </template>
             </v-list>
           </v-flex>
@@ -159,15 +164,12 @@
       <v-flex xs12>
         <v-layout row>
           <v-flex style="width:calc(100% - 360px);//border:1px solid black;">
-            <!-- <div class="title font-weight-thin text-truncate pa-1 ma-1">
-              texttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttext
-            </div>
-            <div class="caption pa-1 ma-1">added by user1</div> -->
             <v-responsive :aspect-ratio="16 / 9" class="pa-1 ma-1">
               <iframe
+                v-if="currentVideo.videoId !== ''"
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/mHrjM6oVez0"
+                :src="`https://www.youtube.com/embed/${currentVideo.videoId}`"
                 frameborder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
@@ -189,6 +191,11 @@ export default {
     return {
       dialog: false,
       socket: '',
+      isLoading: true,
+      mini: false,
+      now: () => {
+        return new Date().toLocaleString('ja-JP')
+      },
       room: {
         id: this.$nuxt.$route.params.roomId,
         name: this.$store.state.user
@@ -196,10 +203,16 @@ export default {
       users: [],
       message: '',
       messages: [],
-      isLoading: true,
-      mini: false,
-      videoQueue: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
-      videoURL: ''
+      videoURL: '',
+      videoQueue: [],
+      currentVideo: {
+        user: { name: '', id: '' },
+        url: '',
+        title: '',
+        duration: '',
+        videoId: '',
+        icon: ''
+      }
     }
   },
   created() {
@@ -236,6 +249,17 @@ export default {
         this.scrollChat()
       })
 
+      this.socket.on('new-video', video => {
+        this.videoQueue.push(video || {})
+      })
+
+      this.socket.on('current-video', data => {
+        this.currentVideo = data.video
+        if (data.index !== null) {
+          this.videoQueue.splice(data.index, 1)
+        }
+      })
+
       this.dialog = false
 
       setTimeout(() => {
@@ -247,14 +271,13 @@ export default {
       if (!this.message.trim() || this.message.trim().length > 200) {
         return
       }
-      const now = new Date().toLocaleString('ja-JP')
       // メッセージオブジェクトを作る
       const message = {
         user: {
           name: this.room.name,
           id: this.socket.id
         },
-        date: now,
+        date: this.now,
         text: this.message.trim()
       }
 
@@ -276,15 +299,26 @@ export default {
         return 0
       })
     },
-    addVideo(url) {
-      if (!url.trim()) {
+    addVideo() {
+      if (!this.videoURL.trim()) {
         return
       }
-      console.log(url)
+      const video = {
+        user: {
+          name: this.room.name,
+          id: this.socket.id
+        },
+        date: this.now,
+        url: this.videoURL.trim()
+      }
+      this.socket.emit('add-video', video)
       this.videoURL = ''
     },
     removeVideo(index) {
       console.log(index)
+    },
+    nextVideo(index) {
+      this.socket.emit('next-video', index)
     }
   }
 }

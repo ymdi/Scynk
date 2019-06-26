@@ -11,3 +11,9 @@ input {
 .urlinput .v-input__control, .urlinput .v-input__slot{
   min-height: 36px !important;
 }
+.video-queue-title {
+  color: black;
+}
+.video-queue-title:hover {
+  text-decoration: underline;
+}

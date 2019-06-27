@@ -34,7 +34,9 @@
                 <v-list-tile-content>
                   <v-list-tile-title>
                     <v-layout row align-center>
-                      <v-icon size="13" color="#FF0000">{{ currentVideo.icon }}</v-icon>
+                      <v-icon size="13" color="#FF0000">
+                        {{ currentVideo.icon !== undefined ? currentVideo.icon : '' }}
+                      </v-icon>
                       <span class="ml-2 text-truncate">
                         {{ currentVideo.title }}
                       </span>
@@ -163,19 +165,21 @@
       <!-- player area -->
       <v-flex xs12>
         <v-layout row>
-          <v-flex style="width:calc(100% - 360px);//border:1px solid black;">
-            <v-responsive :aspect-ratio="16 / 9" class="pa-1 ma-1">
-              <iframe
-                v-if="currentVideo.videoId !== ''"
-                width="100%"
-                height="100%"
-                :src="`https://www.youtube.com/embed/${currentVideo.videoId}`"
-                frameborder="0"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </v-responsive>
-          </v-flex>
+          <v-responsive :aspect-ratio="16 / 9" class="pa-1 ma-1">
+            <youtube
+              ref="youtube"
+              :video-id="currentVideo.videoId"
+              :player-vars="{
+                rel: 0,
+                autoplay: 1,
+                origin: `${location.protocol}//${location.hostname}/`
+              }"
+              width="100%"
+              height="100%"
+              @ended="nextVideo(0)"
+              @playing="seekVideo"
+            ></youtube>
+          </v-responsive>
         </v-layout>
       </v-flex>
       <!-- player area -->
@@ -189,6 +193,10 @@ export default {
   layout: 'layout',
   data() {
     return {
+      location: {
+        protocol: () => (process.client ? location.protocol : ''),
+        hostname: () => (process.client ? location.hostname : '')
+      },
       dialog: false,
       socket: '',
       isLoading: true,
@@ -213,6 +221,11 @@ export default {
         videoId: '',
         icon: ''
       }
+    }
+  },
+  computed: {
+    player() {
+      return this.$refs.youtube.player
     }
   },
   created() {
@@ -251,13 +264,39 @@ export default {
 
       this.socket.on('new-video', video => {
         this.videoQueue.push(video || {})
+        this.$nextTick(() => {
+          if (this.currentVideo.videoId === '') {
+            this.nextVideo(0)
+          }
+        })
+      })
+
+      this.socket.on('removed-video', index => {
+        this.videoQueue.splice(index, 1)
       })
 
       this.socket.on('current-video', data => {
         this.currentVideo = data.video
+        this.player.loadVideoById({
+          videoId: data.video.videoId
+        })
         if (data.index !== null) {
           this.videoQueue.splice(data.index, 1)
+          this.beforeSeekTime = 0
         }
+      })
+
+      this.socket.on('seeked-video', time => {
+        this.player.seekTo(time)
+        this.player.playVideo()
+      })
+
+      this.socket.on('paused-video', () => {
+        this.player.pauseVideo()
+      })
+
+      this.socket.on('get-current-duration', () => {
+        this.seekVideo()
       })
 
       this.dialog = false
@@ -315,10 +354,20 @@ export default {
       this.videoURL = ''
     },
     removeVideo(index) {
-      console.log(index)
+      this.socket.emit('remove-Video', index)
     },
     nextVideo(index) {
       this.socket.emit('next-video', index)
+    },
+    async seekVideo() {
+      const time = await this.player.getCurrentTime()
+      this.socket.emit('seek-video', time)
+    },
+    async playVideo() {
+      await this.player.playVideo()
+    },
+    pauseVideo() {
+      this.socket.emit('paus-video')
     }
   }
 }

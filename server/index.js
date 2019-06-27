@@ -55,7 +55,9 @@ async function start() {
           'users': [],
           'messages': [],
           'videoQueue': [],
-          'currentVideo': {}
+          'currentVideo': {},
+          'currentDuration': 0,
+          'beforeSeeked': new Date().getTime()
         }
       }
       const currentRoom = roomList[roomId]
@@ -65,6 +67,7 @@ async function start() {
         currentRoom.users.forEach(user => {
           socket.emit('new-user', user)
         })
+        socket.emit('get-current-duration')
         if (currentRoom.messages.length > 0) {
           currentRoom.messages.forEach(message => {
             socket.emit('new-message', message)
@@ -80,6 +83,7 @@ async function start() {
             video: currentRoom.currentVideo,
             index: null
           })
+          socket.emit('seek-video', currentRoom.currentDuration)
         }
         console.log(`id: ${socket.id} is joined to ${roomId}`)
         socket.broadcast.to(roomId).emit('new-user', userData)
@@ -123,15 +127,35 @@ async function start() {
       }).catch(err => console.log(err))
     })
 
+    socket.on('remove-video', index => {
+      currentRoom.videoQueue.splice(index, 1)
+      io.in(roomId).emit('removed-video', index)
+    })
+
     socket.on('next-video', index => {
       const currentRoom = roomList[roomId]
-      const currentVideo = currentRoom.videoQueue[index]
+      const currentVideo = currentRoom.videoQueue ? currentRoom.videoQueue[index] : ''
       currentRoom.currentVideo = currentVideo
+      currentRoom.currentDuration = 0
       currentRoom.videoQueue.splice(index, 1)
       io.in(roomId).emit('current-video', {
         video: currentVideo,
         index: index
       })
+    })
+
+    socket.on('seek-video', time => {
+      const secs = (new Date().getTime() - roomList[roomId].beforeSeeked) / 1000
+      if (secs < 1) {
+        return
+      }
+      roomList[roomId].beforeSeeked = new Date().getTime()
+      roomList[roomId].currentDuration = time
+      socket.broadcast.to(roomId).emit('seeked-video', time)
+    })
+
+    socket.on('pause-video', () => {
+      socket.broadcast.to(roomId).emit('paused-video')
     })
 
     socket.on('disconnect', () => {

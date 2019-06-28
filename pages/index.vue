@@ -12,9 +12,9 @@
                 v-model="name"
                 :rules="[rules.required]"
                 label="Name"
-                @keyup.enter="enterRoom"
+                @keypress.enter="enterRoom"
               ></v-text-field>
-              <v-text-field v-model="roomId" label="Room ID(default : 1)" @keyup.enter="enterRoom"></v-text-field>
+              <v-text-field v-model="roomId" label="Room ID(default : 1)" @keypress.enter="enterRoom"></v-text-field>
               <v-btn :disabled="!name.trim()" block color="primary" @click="enterRoom">Enter</v-btn>
             </v-form>
             <hr class="my-3" />

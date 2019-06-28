@@ -36,16 +36,16 @@ async function start() {
     badge: true
   })
 
-  let roomList = {}
+  let roomList = []
 
   const io = require('socket.io').listen(server)
 
   io.on('connection', function(socket){
-    let userData, roomId = ''
+    let roomId = ''
     console.log(`id: ${socket.id} is connected`)
 
     socket.on('join-room', data => {
-      userData = {
+      const userData = {
         'id': socket.id,
         'name': data.name
       }
@@ -81,10 +81,16 @@ async function start() {
         if (currentRoom.currentVideo !== undefined) {
           socket.emit('current-video', {
             video: currentRoom.currentVideo,
-            index: null,
-            currentDuration: currentRoom.currentDuration
+            index: null
           })
         }
+        setTimeout(() => {
+          if (currentRoom.currentDuration !== 0) {
+            console.log(currentRoom.currentDuration)
+            socket.emit('seeked-video', currentRoom.currentDuration)
+          }
+        }, 1000)
+        
         console.log(`id: ${socket.id} is joined to ${roomId}`)
         socket.broadcast.to(roomId).emit('new-user', userData)
       })

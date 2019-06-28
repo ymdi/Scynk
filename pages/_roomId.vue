@@ -223,8 +223,7 @@ export default {
         duration: '',
         videoId: '',
         icon: ''
-      },
-      currentDuration: 0
+      }
     }
   },
   computed: {
@@ -285,7 +284,6 @@ export default {
         this.player.loadVideoById({
           videoId: data.video.videoId
         })
-        this.currentDuration = data.currentDuration ? data.currentDuration : 0
         if (data.index !== null) {
           this.videoQueue.splice(data.index, 1)
           this.beforeSeekTime = 0
@@ -293,6 +291,7 @@ export default {
       })
 
       this.socket.on('seeked-video', time => {
+        console.log(time)
         this.player.seekTo(time)
         this.player.playVideo()
       })
@@ -370,11 +369,6 @@ export default {
       this.socket.emit('next-video', index)
     },
     async seekVideo() {
-      if (this.currentDuration !== 0) {
-        this.player.seekTo(this.currentDuration)
-        this.currentDuration = 0
-        return
-      }
       const time = await this.player.getCurrentTime()
       this.socket.emit('seek-video', time)
     },

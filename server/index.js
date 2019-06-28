@@ -125,8 +125,7 @@ async function start() {
         roomList[roomId].videoQueue.push(video)
         io.in(roomId).emit('new-video', video)
       }).catch(err => {
-        console.log(err.response)
-        console.log(err.error)
+        console.log(err.response.data)
       })
     })
 

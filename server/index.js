@@ -126,7 +126,7 @@ async function start() {
         io.in(roomId).emit('new-video', video)
       }).catch(err => {
         console.log(err.response)
-        console.log(err.error())
+        console.log(err.error)
       })
     })
 

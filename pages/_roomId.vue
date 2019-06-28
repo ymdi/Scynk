@@ -265,7 +265,7 @@ export default {
       this.socket.on('new-video', video => {
         this.videoQueue.push(video || {})
         this.$nextTick(() => {
-          if (this.currentVideo.videoId === '' || this.isLoading === false) {
+          if (this.currentVideo.videoId === '' && this.isLoading === false) {
             this.nextVideo(0)
           }
         })

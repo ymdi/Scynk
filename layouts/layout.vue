@@ -4,7 +4,7 @@
       <v-toolbar-title v-text="title" />
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn v-for="item in menu" :key="item.title" :href="item.link" flat>
+        <v-btn v-for="item in menu" :key="item.title" :href="item.link" target="_blank" flat>
           <v-icon size="14">{{ item.icon }}</v-icon>
           <span class="pl-1">{{ item.title }}</span>
         </v-btn>
@@ -24,7 +24,7 @@ export default {
       menu: [
         { title: 'join room', icon: 'fas fa-door-open', link: '/' },
         { title: 'source', icon: 'fab fa-github', link: 'https://github.com/ymdi/Scynchro' },
-        { title: 'Twitter', icon: 'fab fa-twitter', link: 'https://twitter.com/sababread' }
+        { title: 'contact', icon: 'fab fa-twitter', link: 'https://twitter.com/sababread' }
       ]
     }
   }

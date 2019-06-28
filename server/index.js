@@ -78,7 +78,7 @@ async function start() {
             socket.emit('new-video', video)
           })
         }
-        if (currentRoom.currentVideo.title !== undefined) {
+        if (typeof currentRoom.currentVideo.title !== undefined) {
           socket.emit('current-video', {
             video: currentRoom.currentVideo,
             index: null

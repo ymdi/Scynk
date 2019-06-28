@@ -123,7 +123,7 @@
                     <tr v-for="(user, index) in users" :key="user.id">
                       <td
                         class="pl-3"
-                        :class="index == users.length - 1 ? 'pb-3' : 'pb-1'"
+                        :class="index === users.length - 1 ? 'pb-3' : 'pb-1'"
                         style="word-wrap:break-word;"
                         v-text="user.name"
                       ></td>

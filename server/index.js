@@ -124,7 +124,10 @@ async function start() {
         
         roomList[roomId].videoQueue.push(video)
         io.in(roomId).emit('new-video', video)
-      }).catch(err => console.log(err))
+      }).catch(err => {
+        console.log(err.response)
+        console.log(err.error())
+      })
     })
 
     socket.on('remove-video', index => {
@@ -161,7 +164,7 @@ async function start() {
     socket.on('disconnect', () => {
       const currentRoom = roomList[roomId]
       console.log(`id: ${socket.id} is disconnected from ${roomId}`)
-      if(currentRoom != undefined){
+      if(currentRoom !== undefined){
         const index = currentRoom.users.findIndex((elm) => elm.id === socket.id)
         const removedUser = currentRoom.users.splice(index, 1)
         socket.broadcast.to(roomId).emit('user-left', removedUser[0])

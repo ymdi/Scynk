@@ -11,7 +11,6 @@ require('dotenv').config()
 // Import and Set Nuxt.js options
 const config = require('../nuxt.config.js')
 config.dev = !(process.env.NODE_ENV === 'production')
-console.log(process.env.Youtube_API_KEY)
 
 async function start() {
   // Init Nuxt.js

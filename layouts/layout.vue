@@ -24,7 +24,7 @@ export default {
       menu: [
         { title: 'join room', icon: 'fas fa-door-open', link: '/' },
         { title: 'source', icon: 'fab fa-github', link: 'https://github.com/ymdi/Scynchro' },
-        { title: 'contact to me', icon: 'fab fa-twitter', link: 'https://twitter.com/sababread' }
+        { title: 'contact', icon: 'fab fa-twitter', link: 'https://twitter.com/sababread' }
       ]
     }
   }

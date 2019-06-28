@@ -152,6 +152,7 @@
               no-resize
               rows="3"
               hide-details
+              @keypress="sendMessageFlag = true"
               @keyup.enter="sendMessage"
             ></v-textarea>
             <v-flex text-xs-right pt-1>
@@ -211,6 +212,7 @@ export default {
       },
       users: [],
       message: '',
+      sendMessageFlag: false,
       messages: [],
       videoURL: '',
       videoQueue: [],
@@ -311,7 +313,7 @@ export default {
       }, 1000)
     },
     sendMessage() {
-      if (!this.message.trim() || this.message.trim().length > 200) {
+      if (!this.message.trim() || this.message.trim().length > 200 || !this.sendMessageFlag) {
         return
       }
       // メッセージオブジェクトを作る
@@ -331,6 +333,7 @@ export default {
       this.scrollChat()
       // input要素を空にする
       this.message = ''
+      this.sendMessageFlag = false
     },
     scrollChat(flag = '') {
       this.$nextTick(() => {

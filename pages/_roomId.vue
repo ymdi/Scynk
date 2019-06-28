@@ -46,7 +46,7 @@
                 </v-list-tile-content>
                 <v-list-tile-action style="width: 20px;min-width: 30px !important;">
                   <v-flex></v-flex>
-                  <v-list-tile-action-text v-if="currentVideo.user.name !== ''">
+                  <v-list-tile-action-text v-if="currentVideo.user !== undefined && currentVideo.user.name !== ''">
                     added by {{ currentVideo.user.name }}
                   </v-list-tile-action-text>
                 </v-list-tile-action>
@@ -187,6 +187,7 @@
   </v-container>
 </template>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 import io from 'socket.io-client'
 export default {
@@ -220,7 +221,8 @@ export default {
         duration: '',
         videoId: '',
         icon: ''
-      }
+      },
+      currentDuration: 0
     }
   },
   computed: {
@@ -250,6 +252,7 @@ export default {
 
       this.socket.on('new-user', user => {
         this.users.push(user || '')
+        this.seekVideo()
       })
 
       this.socket.on('user-left', user => {
@@ -265,7 +268,7 @@ export default {
       this.socket.on('new-video', video => {
         this.videoQueue.push(video || {})
         this.$nextTick(() => {
-          if (this.currentVideo.videoId === '' && this.isLoading === false) {
+          if (this.currentVideo.title === undefined && this.isLoading === false) {
             this.nextVideo(0)
           }
         })
@@ -280,6 +283,7 @@ export default {
         this.player.loadVideoById({
           videoId: data.video.videoId
         })
+        this.currentDuration = data.currentDuration ? data.currentDuration : 0
         if (data.index !== null) {
           this.videoQueue.splice(data.index, 1)
           this.beforeSeekTime = 0
@@ -354,12 +358,20 @@ export default {
       this.videoURL = ''
     },
     removeVideo(index) {
-      this.socket.emit('remove-Video', index)
+      this.socket.emit('remove-video', index)
     },
     nextVideo(index) {
+      if (this.videoQueue.length === 0) {
+        return
+      }
       this.socket.emit('next-video', index)
     },
     async seekVideo() {
+      if (this.currentDuration !== 0) {
+        this.player.seekTo(this.currentDuration)
+        this.currentDuration = 0
+        return
+      }
       const time = await this.player.getCurrentTime()
       this.socket.emit('seek-video', time)
     },

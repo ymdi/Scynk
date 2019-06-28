@@ -67,7 +67,7 @@ async function start() {
         currentRoom.users.forEach(user => {
           socket.emit('new-user', user)
         })
-        socket.emit('get-current-duration')
+        socket.broadcast.to(roomId).emit('get-current-duration')
         if (currentRoom.messages.length > 0) {
           currentRoom.messages.forEach(message => {
             socket.emit('new-message', message)
@@ -78,12 +78,12 @@ async function start() {
             socket.emit('new-video', video)
           })
         }
-        if (typeof currentRoom.currentVideo.title !== undefined) {
+        if (currentRoom.currentVideo !== undefined) {
           socket.emit('current-video', {
             video: currentRoom.currentVideo,
-            index: null
+            index: null,
+            currentDuration: currentRoom.currentDuration
           })
-          socket.emit('seek-video', currentRoom.currentDuration)
         }
         console.log(`id: ${socket.id} is joined to ${roomId}`)
         socket.broadcast.to(roomId).emit('new-user', userData)
@@ -130,7 +130,7 @@ async function start() {
     })
 
     socket.on('remove-video', index => {
-      currentRoom.videoQueue.splice(index, 1)
+      roomList[roomId].videoQueue.splice(index, 1)
       io.in(roomId).emit('removed-video', index)
     })
 

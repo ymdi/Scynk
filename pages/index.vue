@@ -8,9 +8,14 @@
           <v-card-title class="headline">ルームに入る</v-card-title>
           <v-card-text>
             <v-form>
-              <v-text-field v-model="name" :rules="[rules.required]" label="Name"></v-text-field>
+              <v-text-field
+                v-model="name"
+                :rules="[rules.required]"
+                label="Name"
+                @keyup.enter="enterRoom"
+              ></v-text-field>
               <v-text-field v-model="roomId" label="Room ID(default : 1)" @keyup.enter="enterRoom"></v-text-field>
-              <v-btn block color="primary" @click="enterRoom">Enter</v-btn>
+              <v-btn :disabled="!name.trim()" block color="primary" @click="enterRoom">Enter</v-btn>
             </v-form>
             <hr class="my-3" />
             <p>
@@ -43,6 +48,9 @@ export default {
   },
   methods: {
     enterRoom: function() {
+      if (!this.name.trim()) {
+        return
+      }
       if (!this.roomId) {
         this.roomId = 1
       }

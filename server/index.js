@@ -86,7 +86,6 @@ async function start() {
         }
         setTimeout(() => {
           if (currentRoom.currentDuration !== 0) {
-            console.log(currentRoom.currentDuration)
             socket.emit('seeked-video', currentRoom.currentDuration)
           }
         }, 1000)

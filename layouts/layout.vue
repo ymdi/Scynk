@@ -4,7 +4,13 @@
       <v-toolbar-title v-text="title" />
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn v-for="item in menu" :key="item.title" :href="item.link" target="_blank" flat>
+        <v-btn
+          v-for="(item, index) in menu"
+          :key="item.title"
+          :href="item.link"
+          :target="index > 0 ? '_blank' : ''"
+          flat
+        >
           <v-icon size="14">{{ item.icon }}</v-icon>
           <span class="pl-1">{{ item.title }}</span>
         </v-btn>

@@ -79,8 +79,8 @@
                           <!-- <v-icon v-if="index % 2 == 0" size="13" color="#FF0000">fab fa-youtube</v-icon>
                           <v-icon v-else size="13" color="#6441A4">fab fa-twitch</v-icon> -->
                           <v-icon size="13" color="#FF0000">{{ video.icon }}</v-icon>
-                          <a class="video-queue-title" @click="nextVideo(index)">
-                            <span class="ml-2 text-truncate">
+                          <a class="ml-2 text-truncate video-queue-title" @click="nextVideo(index)">
+                            <span>
                               {{ video.title }}
                             </span>
                           </a>

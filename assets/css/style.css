@@ -17,3 +17,6 @@ input {
 .video-queue-title:hover {
   text-decoration: underline;
 }
+.layout-btn {
+  text-transform: none !important;
+}

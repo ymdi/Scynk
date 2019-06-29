@@ -10,6 +10,7 @@
           :href="item.link"
           :target="index > 0 ? '_blank' : ''"
           flat
+          class="layout-btn"
         >
           <v-icon size="14">{{ item.icon }}</v-icon>
           <span class="pl-1">{{ item.title }}</span>
@@ -28,9 +29,9 @@ export default {
     return {
       title: 'Scynchro',
       menu: [
-        { title: 'join room', icon: 'fas fa-door-open', link: '/' },
-        { title: 'source', icon: 'fab fa-github', link: 'https://github.com/ymdi/Scynchro' },
-        { title: 'contact', icon: 'fab fa-twitter', link: 'https://twitter.com/sababread' }
+        { title: 'Join room', icon: 'fas fa-door-open', link: '/' },
+        { title: 'Source', icon: 'fab fa-github', link: 'https://github.com/ymdi/Scynchro' },
+        { title: 'Contact', icon: 'fab fa-twitter', link: 'https://twitter.com/sababread' }
       ]
     }
   }

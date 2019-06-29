@@ -157,7 +157,7 @@
             ></v-textarea>
             <v-flex text-xs-right pt-1>
               <span class="body-1" :style="message.length > 200 ? 'color: red;' : ''">{{ message.length }}/200</span>
-              <v-btn small color="primary" :disabled="message.length > 200" @click="sendMessage">Send</v-btn>
+              <v-btn small color="primary" :disabled="message.length > 200" @click="clickSend">Send</v-btn>
             </v-flex>
           </v-layout>
         </v-layout>
@@ -291,7 +291,6 @@ export default {
       })
 
       this.socket.on('seeked-video', time => {
-        console.log(time)
         this.player.seekTo(time)
         this.player.playVideo()
       })
@@ -312,8 +311,13 @@ export default {
         this.$store.commit('name', this.room.name)
       }, 1000)
     },
+    clickSend() {
+      this.sendMessageFlag = true
+      this.sendMessage()
+    },
     sendMessage() {
       if (!this.message.trim() || this.message.trim().length > 200 || !this.sendMessageFlag) {
+        this.sendMessageFlag = false
         return
       }
       // メッセージオブジェクトを作る

@@ -309,6 +309,7 @@ export default {
       setTimeout(() => {
         this.isLoading = false
         this.scrollChat('initial')
+        this.$store.commit('name', this.room.name)
       }, 1000)
     },
     sendMessage() {

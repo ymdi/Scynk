@@ -39,7 +39,7 @@ export default {
   components: {},
   data() {
     return {
-      name: '',
+      name: this.$store.state.user !== null ? this.$store.state.user : '',
       roomId: '',
       rules: {
         required: value => !!value || 'Required.'

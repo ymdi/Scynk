@@ -48,7 +48,8 @@ module.exports = {
    */
   plugins: [
     '@/plugins/vuetify',
-    '@/plugins/vue-youtube'
+    '@/plugins/vue-youtube',
+    '@/plugins/cookie-storage.js'
   ],
 
   /*

@@ -86,7 +86,7 @@ async function start() {
         }
         setTimeout(() => {
           if (currentRoom.currentDuration !== 0) {
-            socket.emit('seeked-video', currentRoom.currentDuration)
+            socket.emit('seeked-video', currentRoom.currentDuration + 1)
           }
         }, 1000)
         

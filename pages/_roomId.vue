@@ -19,12 +19,24 @@
       </v-dialog>
       <!-- </template> -->
       <!-- left drawer -->
-      <v-navigation-drawer fixed clipped app expand-on-hover width="300px" :mini-variant.sync="mini">
-        <v-layout column fill-height>
+      <v-navigation-drawer
+        fixed
+        clipped
+        app
+        width="300px"
+        :mini-variant.sync="mini"
+        mini-variant-width="60"
+        mobile-break-point="780"
+      >
+        <v-btn v-if="mini" icon large @click="mini = false">
+          <v-icon>playlist_play</v-icon>
+        </v-btn>
+        <v-layout v-if="!mini" column fill-height>
           <v-layout row align-center>
             <span class="subheading my-2 ml-3">Now Playing</span>
-            <v-btn icon disabled style="visibility: hidden;">
-              <v-icon></v-icon>
+            <v-spacer></v-spacer>
+            <v-btn icon @click.stop="mini = true">
+              <v-icon>chevron_left</v-icon>
             </v-btn>
           </v-layout>
           <v-divider></v-divider>
@@ -105,7 +117,7 @@
       </v-navigation-drawer>
       <!-- left drawer -->
       <!-- right drawer -->
-      <v-navigation-drawer fixed clipped app right permanent width="350px">
+      <v-navigation-drawer fixed clipped app right width="350px" mobile-break-point="780">
         <v-layout column fill-height>
           <v-layout row align-center>
             <span class="subheading my-2 ml-3">Chat</span>
@@ -202,7 +214,6 @@ export default {
       dialog: false,
       socket: '',
       isLoading: true,
-      mini: false,
       now: () => {
         return new Date().toLocaleString('ja-JP')
       },
@@ -223,7 +234,8 @@ export default {
         duration: '',
         videoId: '',
         icon: ''
-      }
+      },
+      mini: false
     }
   },
   computed: {
@@ -242,6 +254,17 @@ export default {
     if (this.room.name !== null) {
       this.joinRoom()
     }
+
+    this.$store.watch(
+      (state, getters) => getters.getWindowSize,
+      (newValue, oldValue) => {
+        if (780 < newValue && newValue < 1264) {
+          this.mini = true
+        } else {
+          this.mini = false
+        }
+      }
+    )
   },
   methods: {
     joinRoom() {

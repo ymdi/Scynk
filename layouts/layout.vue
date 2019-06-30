@@ -19,7 +19,7 @@
       <v-menu bottom left>
         <template v-slot:activator="{ on }">
           <v-btn icon class="hidden-sm-and-up" v-on="on">
-            <v-icon>menu</v-icon>
+            <v-icon>more_vert</v-icon>
           </v-btn>
         </template>
         <v-list>

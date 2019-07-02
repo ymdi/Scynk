@@ -14,7 +14,7 @@
                 label="Name"
                 @keypress.enter="enterRoom"
               ></v-text-field>
-              <v-text-field v-model="roomId" label="Room ID(default : 1)" @keypress.enter="enterRoom"></v-text-field>
+              <v-text-field v-model="roomId" label="Room ID(default : scynchro)" @keypress.enter="enterRoom"></v-text-field>
               <v-btn :disabled="!name.trim()" block color="primary" @click="enterRoom">Enter</v-btn>
             </v-form>
             <hr class="mt-3 mb-2" />
@@ -64,7 +64,7 @@ export default {
         return
       }
       if (!this.roomId) {
-        this.roomId = 1
+        this.roomId = 'scynchro'
       }
       this.$store.commit('name', this.name)
       this.$router.push(`/${this.roomId}`)

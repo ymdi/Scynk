@@ -17,7 +17,19 @@
               <v-text-field v-model="roomId" label="Room ID(default : 1)" @keypress.enter="enterRoom"></v-text-field>
               <v-btn :disabled="!name.trim()" block color="primary" @click="enterRoom">Enter</v-btn>
             </v-form>
-            <hr class="my-3" />
+            <hr class="mt-3 mb-2" />
+            <v-layout row mb-2>
+              <v-btn
+                :href="
+                  `https://twitter.com/intent/tweet?hashtags=scynchro&ref_src=twsrc%5Etfw&text=Scynchroで一緒に動画を見ましょう！&tw_p=tweetbutton&url=https://scynchro.herokuapp.com/`
+                "
+                color="#55acee"
+                small
+              >
+                <v-icon size="14" color="white">fab fa-twitter</v-icon>
+                <span class="pl-2 white--text">ツイート</span>
+              </v-btn>
+            </v-layout>
             <p>
               アドバイス、ご意見、ご要望はこちらまで！
               <a href="https://twitter.com/sababread" target="_blank" title="contribute">Twitter</a>.

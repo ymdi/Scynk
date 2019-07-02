@@ -181,7 +181,7 @@
           :player-vars="{
             rel: 0,
             autoplay: 1,
-            origin: `${location.protocol}//${location.hostname}/`
+            origin: `${protocol}//${hostname}/`
           }"
           width="100%"
           height="100%"
@@ -191,6 +191,20 @@
       </v-responsive>
     </v-flex>
     <!-- player area -->
+    <v-layout row>
+      <v-btn
+        :href="
+          `https://twitter.com/intent/tweet?hashtags=scynchro&ref_src=twsrc%5Etfw&text=${
+            room.id
+          }で動画再生中！&tw_p=tweetbutton&url=https://scynchro.herokuapp.com/${room.id}`
+        "
+        color="#55acee"
+        small
+      >
+        <v-icon size="14" color="white">fab fa-twitter</v-icon>
+        <span class="pl-2 white--text">ツイート</span>
+      </v-btn>
+    </v-layout>
   </v-container>
 </template>
 
@@ -201,10 +215,8 @@ export default {
   layout: 'layout',
   data() {
     return {
-      location: {
-        protocol: () => (process.client ? location.protocol : ''),
-        hostname: () => (process.client ? location.hostname : '')
-      },
+      protocol: null,
+      hostname: null,
       dialog: false,
       socket: '',
       isLoading: true,
@@ -259,6 +271,11 @@ export default {
         }
       }
     )
+
+    if (process.client) {
+      this.protocol = location.protocol
+      this.hostname = location.hostname
+    }
   },
   methods: {
     joinRoom() {

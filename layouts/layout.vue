@@ -23,7 +23,7 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-tile v-for="item in menu" :key="item.icon">
+          <v-list-tile v-for="(item, index) in menu" :key="item.icon">
             <v-btn
               :href="item.link"
               :target="index > 0 ? '_blank' : ''"
@@ -34,14 +34,6 @@
               <v-icon size="14">{{ item.icon }}</v-icon>
               <span class="pl-1">{{ item.title }}</span>
             </v-btn>
-            <!-- <v-list-tile-content>
-              <v-list-tile-title>
-                <v-layout row align-center>
-                  <v-icon size="14">{{ item.icon }}</v-icon>
-                  <span class="pl-2">{{ item.title }}</span>
-                </v-layout>
-              </v-list-tile-title>
-            </v-list-tile-content> -->
           </v-list-tile>
         </v-list>
       </v-menu>

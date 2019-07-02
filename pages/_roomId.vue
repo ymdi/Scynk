@@ -1,202 +1,196 @@
 <template>
-  <v-container>
-    <v-layout column wrap>
-      <!-- <template v-if="$store.state.user === null"> -->
-      <v-dialog v-model="dialog" persistent max-width="600px">
-        <v-card>
-          <v-card-title>Enter Name</v-card-title>
-          <v-card-text>
-            <v-layout>
-              <v-flex xs12>
-                <v-text-field v-model="room.name" label="Name" @keyup.enter="joinRoom"></v-text-field>
-                <v-btn block :disabled="room.name === null || !room.name.trim()" color="primary" @click="joinRoom">
-                  Enter
-                </v-btn>
-              </v-flex>
-            </v-layout>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-      <!-- </template> -->
-      <!-- left drawer -->
-      <v-navigation-drawer
-        fixed
-        clipped
-        app
-        width="300px"
-        :mini-variant.sync="mini"
-        mini-variant-width="60"
-        mobile-break-point="780"
-      >
-        <v-btn v-if="mini" icon large @click="mini = false">
-          <v-icon>playlist_play</v-icon>
-        </v-btn>
-        <v-layout v-if="!mini" column fill-height>
-          <v-layout row align-center>
-            <span class="subheading my-2 ml-3">Now Playing</span>
-            <v-spacer></v-spacer>
-            <v-btn icon @click.stop="mini = true">
-              <v-icon>chevron_left</v-icon>
-            </v-btn>
-          </v-layout>
-          <v-divider></v-divider>
-          <v-flex my-2>
-            <v-list two-line dense>
-              <v-list-tile>
-                <v-list-tile-content>
-                  <v-list-tile-title>
-                    <v-layout row align-center>
-                      <v-icon size="13" color="#FF0000">
-                        {{ currentVideo.icon !== undefined ? currentVideo.icon : '' }}
-                      </v-icon>
-                      <span class="ml-2 text-truncate">
-                        {{ currentVideo.title }}
-                      </span>
-                    </v-layout>
-                  </v-list-tile-title>
-                  <v-list-tile-sub-title>{{ currentVideo.duration }}</v-list-tile-sub-title>
-                </v-list-tile-content>
-                <v-list-tile-action style="width: 20px;min-width: 30px !important;">
-                  <v-flex></v-flex>
-                  <v-list-tile-action-text v-if="currentVideo.user !== undefined && currentVideo.user.name !== ''">
-                    added by {{ currentVideo.user.name }}
-                  </v-list-tile-action-text>
-                </v-list-tile-action>
-              </v-list-tile>
-            </v-list>
-          </v-flex>
-          <v-divider></v-divider>
-          <v-layout row align-center pl-2 py-1>
-            <v-text-field
-              v-model="videoURL"
-              solo
-              hide-details
-              label="Video URL"
-              class="urlinput"
-              @keyup.enter="addVideo"
-            ></v-text-field>
-            <v-btn color="primary" style="min-width: 0px;" @click="addVideo">
-              <v-icon color="white">playlist_add</v-icon>
-            </v-btn>
-          </v-layout>
-          <v-divider></v-divider>
-          <v-flex id="video-queue" xs12 pa-1 ma-1 style="overflow-y: auto;">
-            <v-list two-line dense>
-              <template v-for="(video, index) in videoQueue">
-                <div :key="index">
-                  <v-list-tile>
-                    <v-list-tile-content>
-                      <v-list-tile-title>
-                        <v-layout row align-center>
-                          <!-- <v-icon v-if="index % 2 == 0" size="13" color="#FF0000">fab fa-youtube</v-icon>
-                          <v-icon v-else size="13" color="#6441A4">fab fa-twitch</v-icon> -->
-                          <v-icon size="13" color="#FF0000">{{ video.icon }}</v-icon>
-                          <a class="ml-2 text-truncate video-queue-title" @click="nextVideo(index)">
-                            <span>
-                              {{ video.title }}
-                            </span>
-                          </a>
-                        </v-layout>
-                      </v-list-tile-title>
-                      <v-list-tile-sub-title>{{ video.duration }}</v-list-tile-sub-title>
-                    </v-list-tile-content>
-                    <v-list-tile-action style="width: 20px;min-width: 30px !important;">
-                      <v-flex></v-flex>
-                      <v-list-tile-action-text>
-                        <span class="pr-1">added by {{ video.user.name }}</span>
-                        <v-icon size="15" color="primary" @click="removeVideo(index)">fas fa-trash-alt</v-icon>
-                      </v-list-tile-action-text>
-                    </v-list-tile-action>
-                  </v-list-tile>
-                  <v-divider v-if="index < videoQueue.length - 1" class="pb-2"></v-divider>
-                </div>
-              </template>
-            </v-list>
-          </v-flex>
-        </v-layout>
-      </v-navigation-drawer>
-      <!-- left drawer -->
-      <!-- right drawer -->
-      <v-navigation-drawer fixed clipped app right width="350px" mobile-break-point="780">
-        <v-layout column fill-height>
-          <v-layout row align-center>
-            <span class="subheading my-2 ml-3">Chat</span>
-            <v-spacer></v-spacer>
-            <v-menu bottom left allow-overflow text-xs-right max-height="70%">
-              <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on">
-                  <v-icon>list</v-icon>
-                </v-btn>
-              </template>
-              <v-card width="250">
-                <v-flex pt-3 pb-2 pl-3><span class="font-weight-bold body-2">Users</span></v-flex>
-                <v-flex>
-                  <table>
-                    <tr v-for="(user, index) in users" :key="user.id">
-                      <td
-                        class="pl-3"
-                        :class="index === users.length - 1 ? 'pb-3' : 'pb-1'"
-                        style="word-wrap:break-word;"
-                        v-text="user.name"
-                      ></td>
-                    </tr>
-                  </table>
-                </v-flex>
-              </v-card>
-            </v-menu>
-          </v-layout>
-          <v-divider></v-divider>
-          <v-flex id="chat-area" xs12 pa-1 ma-1 style="overflow-y: auto;">
-            <div v-for="(mess, index) in messages" :key="index" class="px-1">
-              <p>
-                <strong>{{ mess.user.name }}</strong
-                >:
-                <span style="word-wrap:break-word;">{{ mess.text }}</span>
-              </p>
-            </div>
-          </v-flex>
-          <v-divider></v-divider>
-          <v-layout column justify-end xs12 ma-2>
-            <v-textarea
-              v-model="message"
-              placeholder="message"
-              solo
-              no-resize
-              rows="3"
-              hide-details
-              @keypress="sendMessageFlag = true"
-              @keyup.enter="sendMessage"
-            ></v-textarea>
-            <v-flex text-xs-right pt-1>
-              <span class="body-1" :style="message.length > 200 ? 'color: red;' : ''">{{ message.length }}/200</span>
-              <v-btn small color="primary" :disabled="message.length > 200" @click="clickSend">Send</v-btn>
+  <v-container style="height: 100%;">
+    <v-dialog v-model="dialog" persistent max-width="600px">
+      <v-card>
+        <v-card-title>Enter Name</v-card-title>
+        <v-card-text>
+          <v-layout>
+            <v-flex xs12>
+              <v-text-field v-model="room.name" label="Name" @keyup.enter="joinRoom"></v-text-field>
+              <v-btn block :disabled="room.name === null || !room.name.trim()" color="primary" @click="joinRoom">
+                Enter
+              </v-btn>
             </v-flex>
           </v-layout>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!-- left drawer -->
+    <v-navigation-drawer
+      fixed
+      clipped
+      app
+      width="320"
+      :mini-variant.sync="mini"
+      mini-variant-width="60"
+      mobile-break-point="780"
+    >
+      <v-btn v-if="mini" icon large @click="mini = false">
+        <v-icon>playlist_play</v-icon>
+      </v-btn>
+      <v-layout v-if="!mini" column fill-height>
+        <v-layout row align-center>
+          <span class="subheading my-2 ml-3">Now Playing</span>
+          <v-spacer></v-spacer>
+          <v-btn icon @click.stop="mini = true">
+            <v-icon>chevron_left</v-icon>
+          </v-btn>
         </v-layout>
-      </v-navigation-drawer>
-      <!-- right drawer -->
-      <!-- player area -->
-      <v-flex xs12>
-        <v-layout row>
-          <v-responsive :aspect-ratio="16 / 9" class="pa-1 ma-1">
-            <youtube
-              ref="youtube"
-              :video-id="currentVideo.videoId"
-              :player-vars="{
-                rel: 0,
-                autoplay: 1,
-                origin: `${location.protocol}//${location.hostname}/`
-              }"
-              width="100%"
-              height="100%"
-              @ended="nextVideo(0)"
-              @playing="seekVideo"
-            ></youtube>
-          </v-responsive>
+        <v-divider></v-divider>
+        <v-flex my-2>
+          <v-list two-line dense>
+            <v-list-tile>
+              <v-list-tile-content>
+                <v-list-tile-title>
+                  <v-layout row align-center>
+                    <v-icon size="13" color="#FF0000">
+                      {{ currentVideo.icon !== undefined ? currentVideo.icon : '' }}
+                    </v-icon>
+                    <span class="ml-2 text-truncate">
+                      {{ currentVideo.title }}
+                    </span>
+                  </v-layout>
+                </v-list-tile-title>
+                <v-list-tile-sub-title>{{ currentVideo.duration }}</v-list-tile-sub-title>
+              </v-list-tile-content>
+              <v-list-tile-action style="width: 20px;min-width: 30px !important;">
+                <v-flex></v-flex>
+                <v-list-tile-action-text v-if="currentVideo.user !== undefined && currentVideo.user.name !== ''">
+                  added by {{ currentVideo.user.name }}
+                </v-list-tile-action-text>
+              </v-list-tile-action>
+            </v-list-tile>
+          </v-list>
+        </v-flex>
+        <v-divider></v-divider>
+        <v-layout row align-center pl-2 py-1>
+          <v-text-field
+            v-model="videoURL"
+            solo
+            hide-details
+            label="Video URL"
+            class="urlinput"
+            @keyup.enter="addVideo"
+          ></v-text-field>
+          <v-btn color="primary" style="min-width: 0px;" @click="addVideo">
+            <v-icon color="white">playlist_add</v-icon>
+          </v-btn>
         </v-layout>
-      </v-flex>
-      <!-- player area -->
-    </v-layout>
+        <v-divider></v-divider>
+        <v-flex id="video-queue" xs12 pa-1 ma-1 style="overflow-y: auto;">
+          <v-list two-line dense>
+            <template v-for="(video, index) in videoQueue">
+              <div :key="index">
+                <v-list-tile>
+                  <v-list-tile-content>
+                    <v-list-tile-title>
+                      <v-layout row align-center>
+                        <!-- <v-icon v-if="index % 2 == 0" size="13" color="#FF0000">fab fa-youtube</v-icon>
+                        <v-icon v-else size="13" color="#6441A4">fab fa-twitch</v-icon> -->
+                        <v-icon size="13" color="#FF0000">{{ video.icon }}</v-icon>
+                        <a class="ml-2 text-truncate video-queue-title" @click="nextVideo(index)">
+                          <span>
+                            {{ video.title }}
+                          </span>
+                        </a>
+                      </v-layout>
+                    </v-list-tile-title>
+                    <v-list-tile-sub-title>{{ video.duration }}</v-list-tile-sub-title>
+                  </v-list-tile-content>
+                  <v-list-tile-action style="width: 20px;min-width: 30px !important;">
+                    <v-flex></v-flex>
+                    <v-list-tile-action-text>
+                      <span class="pr-1">added by {{ video.user.name }}</span>
+                      <v-icon size="15" color="primary" @click="removeVideo(index)">fas fa-trash-alt</v-icon>
+                    </v-list-tile-action-text>
+                  </v-list-tile-action>
+                </v-list-tile>
+                <v-divider v-if="index < videoQueue.length - 1" class="pb-2"></v-divider>
+              </div>
+            </template>
+          </v-list>
+        </v-flex>
+      </v-layout>
+    </v-navigation-drawer>
+    <!-- left drawer -->
+    <!-- right drawer -->
+    <v-navigation-drawer fixed clipped app right width="330" mobile-break-point="780">
+      <v-layout column fill-height>
+        <v-layout row align-center>
+          <span class="subheading my-2 ml-3">Chat</span>
+          <v-spacer></v-spacer>
+          <v-menu bottom left allow-overflow text-xs-right max-height="70%">
+            <template v-slot:activator="{ on }">
+              <v-btn icon v-on="on">
+                <v-icon>list</v-icon>
+              </v-btn>
+            </template>
+            <v-card width="250">
+              <v-flex pt-3 pb-2 pl-3><span class="font-weight-bold body-2">Users</span></v-flex>
+              <v-flex>
+                <table>
+                  <tr v-for="(user, index) in users" :key="user.id">
+                    <td
+                      class="pl-3"
+                      :class="index === users.length - 1 ? 'pb-3' : 'pb-1'"
+                      style="word-wrap:break-word;"
+                      v-text="user.name"
+                    ></td>
+                  </tr>
+                </table>
+              </v-flex>
+            </v-card>
+          </v-menu>
+        </v-layout>
+        <v-divider></v-divider>
+        <v-flex id="chat-area" xs12 pa-1 ma-1 style="overflow-y: auto;">
+          <div v-for="(mess, index) in messages" :key="index" class="px-1">
+            <p>
+              <strong>{{ mess.user.name }}</strong
+              >:
+              <span style="word-wrap:break-word;">{{ mess.text }}</span>
+            </p>
+          </div>
+        </v-flex>
+        <v-divider></v-divider>
+        <v-layout column justify-end xs12 ma-2>
+          <v-textarea
+            v-model="message"
+            placeholder="message"
+            solo
+            no-resize
+            rows="3"
+            hide-details
+            @keypress="sendMessageFlag = true"
+            @keyup.enter="sendMessage"
+          ></v-textarea>
+          <v-flex text-xs-right pt-1>
+            <span class="body-1" :style="message.length > 200 ? 'color: red;' : ''">{{ message.length }}/200</span>
+            <v-btn small color="primary" :disabled="message.length > 200" @click="clickSend">Send</v-btn>
+          </v-flex>
+        </v-layout>
+      </v-layout>
+    </v-navigation-drawer>
+    <!-- right drawer -->
+    <!-- player area -->
+    <v-flex>
+      <v-responsive :aspect-ratio="16 / 9" class="pa-1 ma-1">
+        <youtube
+          ref="youtube"
+          :video-id="currentVideo.videoId"
+          :player-vars="{
+            rel: 0,
+            autoplay: 1,
+            origin: `${location.protocol}//${location.hostname}/`
+          }"
+          width="100%"
+          height="100%"
+          @ended="nextVideo(0)"
+          @playing="seekVideo"
+        ></youtube>
+      </v-responsive>
+    </v-flex>
+    <!-- player area -->
   </v-container>
 </template>
 

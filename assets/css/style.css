@@ -1,5 +1,5 @@
 html {
-  overflow: hidden !important;
+  overflow: auto !important;
 }
 textarea {
   margin-top:0 !important;

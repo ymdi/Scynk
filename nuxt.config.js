@@ -1,8 +1,6 @@
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 const pkg = require('./package')
 
-// const { Youtube_API_KEY } = process.env
-
 module.exports = {
   mode: 'universal',
 

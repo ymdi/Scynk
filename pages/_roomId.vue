@@ -198,7 +198,8 @@
             room.id
           }で動画再生中！&tw_p=tweetbutton&url=https://scynchro.herokuapp.com/${room.id}`
         "
-        color="#55acee"
+        target="_blank"
+        color="#1da1f2"
         small
       >
         <v-icon size="14" color="white">fab fa-twitter</v-icon>

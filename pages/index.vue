@@ -14,7 +14,11 @@
                 label="Name"
                 @keypress.enter="enterRoom"
               ></v-text-field>
-              <v-text-field v-model="roomId" label="Room ID(default : scynchro)" @keypress.enter="enterRoom"></v-text-field>
+              <v-text-field
+                v-model="roomId"
+                label="Room ID(default : scynchro)"
+                @keypress.enter="enterRoom"
+              ></v-text-field>
               <v-btn :disabled="!name.trim()" block color="primary" @click="enterRoom">Enter</v-btn>
             </v-form>
             <hr class="mt-3 mb-2" />
@@ -23,7 +27,8 @@
                 :href="
                   `https://twitter.com/intent/tweet?hashtags=scynchro&ref_src=twsrc%5Etfw&text=Scynchroで一緒に動画を見ましょう！&tw_p=tweetbutton&url=https://scynchro.herokuapp.com/`
                 "
-                color="#55acee"
+                target="_blank"
+                color="#1da1f2"
                 small
               >
                 <v-icon size="14" color="white">fab fa-twitter</v-icon>

@@ -20,7 +20,7 @@
       fixed
       clipped
       app
-      width="320"
+      :width="queueWidth"
       :mini-variant.sync="mini"
       mini-variant-width="60"
       mobile-break-point="780"
@@ -114,7 +114,7 @@
     </v-navigation-drawer>
     <!-- left drawer -->
     <!-- right drawer -->
-    <v-navigation-drawer fixed clipped app right width="330" mobile-break-point="780">
+    <v-navigation-drawer fixed clipped app right :width="chatWidth" mobile-break-point="780">
       <v-layout column fill-height>
         <v-layout row align-center>
           <span class="subheading my-2 ml-3">Chat</span>
@@ -242,7 +242,9 @@ export default {
         videoId: '',
         icon: ''
       },
-      mini: false
+      mini: false,
+      queueWidth: 320,
+      chatWidth: 330
     }
   },
   computed: {
@@ -267,8 +269,13 @@ export default {
       (newValue, oldValue) => {
         if (780 < newValue && newValue < 1264) {
           this.mini = true
+        } else if (newValue < 450) {
+          this.queueWidth = 280
+          this.chatWidth = 290
         } else {
           this.mini = false
+          this.queueWidth = 320
+          this.chatWidth = 330
         }
       }
     )

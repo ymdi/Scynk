@@ -424,7 +424,7 @@ export default {
       await this.player.playVideo()
     },
     pauseVideo() {
-      this.socket.emit('paus-video')
+      this.socket.emit('pause-video')
     },
     showQueue() {
       console.log(this.videoQueue)

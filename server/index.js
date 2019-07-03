@@ -103,29 +103,81 @@ async function start() {
     })
 
     socket.on('add-video', video => {
-      const id = video.url.match(/(?<=\?v=).*?(?=&|$)/)
+      const id = video.url.match(/(?<=https:\/\/.*(\?v=|\.be\/)|(.tv\/(?!videos\/)(.*\/clip\/)?)|(.tv\/videos\/))(\w+)/gi)
+      const provider = video.url.match(/youtu|twitch/)
+      const type = video.url.match(/clip|video|youtu/)
       const obj = {
-        id: id !== null ? id[0] : '',
-        type: ''
+        id: id !== null ? id[id.length - 1] : '',
+        provider: provider !== null ? provider[0] : '',
+        type: type !== null ? type[0] : 'stream'
       }
 
       const getData = async (obj) => {
-        return await axios.get('https://www.googleapis.com/youtube/v3/videos',{
-          params:{
-            id: obj.id,
-            key: process.env.Youtube_API_KEY,
-            part: 'snippet, contentDetails',
-            fields: 'items(snippet(title),contentDetails(duration))'
+        if (obj.provider === 'youtu') {
+          return await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+            params: {
+              id: obj.id,
+              key: process.env.Youtube_API_KEY,
+              part: 'snippet, contentDetails',
+              fields: 'items(snippet(title),contentDetails(duration))'
+            }
+          })
+        }
+        if (obj.provider === 'twitch') {
+
+          if (obj.type === 'stream') {
+            let userid = ''
+            return await axios.get('https://api.twitch.tv/helix/users', {
+              headers: {
+                'Client-ID': process.env.Twitch_API_KEY
+              },
+              params: {
+                login: obj.id
+              }
+            }).then((res) => {
+              userid = res.data.data[0].id
+
+              return axios.get('https://api.twitch.tv/helix/streams', {
+                headers: {
+                  'Client-ID': process.env.Twitch_API_KEY
+                },
+                params: {
+                  user_id: userid
+                }
+              })
+            })
           }
-        })
+
+          return await axios.get(`https://api.twitch.tv/helix/${obj.type}s`, {
+            headers: {
+              'Client-ID': process.env.Twitch_API_KEY
+            },
+            params: {
+              id: obj.type !== 'stream' ? obj.id : ''
+            }
+          })
+        }
       }
 
       getData(obj).then((res) => {
-        const data = res.data.items[0]
-        video.title = data.snippet.title
-        video.duration = moment.duration(data.contentDetails.duration).format('hh:mm:ss')
+        // console.log(res.data.data[0])
+        if (obj.provider === 'youtu') {
+          const data = res.data.items[0]
+          video.title = data.snippet.title
+          video.duration = moment.duration(data.contentDetails.duration).format('hh:mm:ss')
+          video.icon = 'fab fa-youtube'
+          video.color = '#FF0000'
+        }
+        if (obj.provider === 'twitch') {
+          const data = res.data.data[0]
+          video.title = data.title
+          video.duration = data.duration ? moment.duration(data.duration.match(/\d*\d/g).join(':')).format('hh:mm:ss') : ''
+          video.icon = 'fab fa-twitch'
+          video.color = '#6441A4'
+        }
         video.videoId = obj.id
-        video.icon = 'fab fa-youtube'
+        video.provider = obj.provider
+        video.type = obj.type
         
         roomList[roomId].videoQueue.push(video)
         io.in(roomId).emit('new-video', video)

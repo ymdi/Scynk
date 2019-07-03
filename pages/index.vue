@@ -25,7 +25,7 @@
             <v-layout row mb-2>
               <v-btn
                 :href="
-                  `https://twitter.com/intent/tweet?hashtags=scynchro&ref_src=twsrc%5Etfw&text=Scynchroで一緒に動画を見ましょう！&tw_p=tweetbutton&url=https://scynchro.herokuapp.com/`
+                  `https://twitter.com/intent/tweet?hashtags=scynchro&ref_src=twsrc%5Etfw&text=Scynchro&tw_p=tweetbutton&url=https://scynchro.herokuapp.com/`
                 "
                 target="_blank"
                 color="#1da1f2"
@@ -36,11 +36,11 @@
               </v-btn>
             </v-layout>
             <p>
-              アドバイス、ご意見、ご要望はこちらまで！
+              アドバイス、ご意見、ご要望はこちら
               <a href="https://twitter.com/sababread" target="_blank" title="contribute">Twitter</a>.
             </p>
             <p>
-              バグ報告はこちらまで！
+              バグ報告はこちら
               <a href="https://github.com/ymdi/Scynchro/issues" target="_blank" title="contribute">issue board</a>.
             </p>
           </v-card-text>

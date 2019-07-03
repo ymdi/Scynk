@@ -1,7 +1,7 @@
 {
   "name": "scynchro",
   "version": "1.0.0",
-  "description": "video synchronize application",
+  "description": "sync and watch video with friends",
   "author": "ymdi",
   "private": true,
   "scripts": {

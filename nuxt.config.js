@@ -92,6 +92,7 @@ module.exports = {
     }
   },
   env: {
-    Youtube_API_KEY: process.env.Youtube_API_KEY
+    Youtube_API_KEY: process.env.Youtube_API_KEY,
+    Twitch_API_KEY: process.env.Twitch_API_KEY
   }
 }

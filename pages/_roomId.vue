@@ -43,7 +43,7 @@
               <v-list-tile-content>
                 <v-list-tile-title>
                   <v-layout row align-center>
-                    <v-icon size="13" color="#FF0000">
+                    <v-icon size="13" :color="currentVideo.color">
                       {{ currentVideo.icon !== undefined ? currentVideo.icon : '' }}
                     </v-icon>
                     <span class="ml-2 text-truncate">
@@ -51,7 +51,7 @@
                     </span>
                   </v-layout>
                 </v-list-tile-title>
-                <v-list-tile-sub-title>{{ currentVideo.duration }}</v-list-tile-sub-title>
+                <v-list-tile-sub-title>{{ currentVideo.duration }}&nbsp;</v-list-tile-sub-title>
               </v-list-tile-content>
               <v-list-tile-action style="width: 20px;min-width: 30px !important;">
                 <v-flex></v-flex>
@@ -85,9 +85,7 @@
                   <v-list-tile-content>
                     <v-list-tile-title>
                       <v-layout row align-center>
-                        <!-- <v-icon v-if="index % 2 == 0" size="13" color="#FF0000">fab fa-youtube</v-icon>
-                        <v-icon v-else size="13" color="#6441A4">fab fa-twitch</v-icon> -->
-                        <v-icon size="13" color="#FF0000">{{ video.icon }}</v-icon>
+                        <v-icon size="13" :color="video.color">{{ video.icon }}</v-icon>
                         <a class="ml-2 text-truncate video-queue-title" @click="nextVideo(index)">
                           <span>
                             {{ video.title }}
@@ -95,7 +93,7 @@
                         </a>
                       </v-layout>
                     </v-list-tile-title>
-                    <v-list-tile-sub-title>{{ video.duration }}</v-list-tile-sub-title>
+                    <v-list-tile-sub-title>{{ video.duration }}&nbsp;</v-list-tile-sub-title>
                   </v-list-tile-content>
                   <v-list-tile-action style="width: 20px;min-width: 30px !important;">
                     <v-flex></v-flex>
@@ -204,6 +202,9 @@
       >
         <v-icon size="14" color="white">fab fa-twitter</v-icon>
         <span class="pl-2 white--text">ツイート</span>
+      </v-btn>
+      <v-btn @click="showQueue">
+        hdhd
       </v-btn>
     </v-layout>
   </v-container>
@@ -424,6 +425,9 @@ export default {
     },
     pauseVideo() {
       this.socket.emit('paus-video')
+    },
+    showQueue() {
+      console.log(this.videoQueue)
     }
   }
 }

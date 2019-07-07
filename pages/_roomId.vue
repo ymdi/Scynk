@@ -203,9 +203,6 @@
         <v-icon size="14" color="white">fab fa-twitter</v-icon>
         <span class="pl-2 white--text">ツイート</span>
       </v-btn>
-      <v-btn @click="showQueue">
-        hdhd
-      </v-btn>
     </v-layout>
   </v-container>
 </template>
@@ -213,7 +210,12 @@
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 import io from 'socket.io-client'
+
 export default {
+  validate({ params }) {
+    const pattern = /^[ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]*$/
+    return pattern.test(params.roomId)
+  },
   layout: 'layout',
   data() {
     return {
@@ -425,9 +427,6 @@ export default {
     },
     pauseVideo() {
       this.socket.emit('pause-video')
-    },
-    showQueue() {
-      console.log(this.videoQueue)
     }
   }
 }

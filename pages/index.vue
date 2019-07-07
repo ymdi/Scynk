@@ -10,16 +10,19 @@
             <v-form>
               <v-text-field
                 v-model="name"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.counter]"
                 label="Name"
                 @keypress.enter="enterRoom"
               ></v-text-field>
               <v-text-field
                 v-model="roomId"
+                :rules="[rules.roomId, rules.counter]"
                 label="Room ID(default : scynchro)"
                 @keypress.enter="enterRoom"
               ></v-text-field>
-              <v-btn :disabled="!name.trim()" block color="primary" @click="enterRoom">Enter</v-btn>
+              <v-btn :disabled="!valids()" block color="primary" @click="enterRoom">
+                Enter
+              </v-btn>
             </v-form>
             <hr class="mt-3 mb-2" />
             <v-layout row mb-2>
@@ -59,13 +62,31 @@ export default {
       name: this.$store.state.user !== null ? this.$store.state.user : '',
       roomId: '',
       rules: {
-        required: value => !!value || 'Required.'
+        required: value => !!value || 'Required.',
+        roomId: value => {
+          const pattern = /^[ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]*$/
+          return pattern.test(value) || 'Special characters are not allowed.'
+        },
+        counter: value => value.length <= 100 || 'Max 100 Caracters.'
       }
     }
   },
   methods: {
-    enterRoom: function() {
+    valids() {
+      const rules = this.rules
       if (!this.name.trim()) {
+        return false
+      }
+      if (rules.roomId(this.roomId) !== true) {
+        return false
+      }
+      if (rules.counter(this.name) !== true || rules.counter(this.roomId) !== true) {
+        return false
+      }
+      return true
+    },
+    enterRoom() {
+      if (!this.valids()) {
         return
       }
       if (!this.roomId) {

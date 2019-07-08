@@ -40,11 +40,11 @@
             </v-layout>
             <p>
               アドバイス、ご意見、ご要望はこちら
-              <a href="https://twitter.com/sababread" target="_blank" title="contribute">Twitter</a>.
+              <a href="https://twitter.com/ymdi_" target="_blank" title="contribute">Twitter</a>
             </p>
             <p>
               バグ報告はこちら
-              <a href="https://github.com/ymdi/Scynchro/issues" target="_blank" title="contribute">issue board</a>.
+              <a href="https://github.com/ymdi/Scynchro/issues" target="_blank" title="contribute">issue board</a>
             </p>
           </v-card-text>
         </v-card>

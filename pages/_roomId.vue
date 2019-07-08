@@ -1,5 +1,5 @@
 <template>
-  <v-container style="height: 100%;">
+  <v-container style="height: 100vh;">
     <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
         <v-card-title>Enter Name</v-card-title>
@@ -122,62 +122,8 @@
     </v-navigation-drawer>
     <!-- left drawer -->
     <!-- right drawer -->
-    <v-navigation-drawer fixed clipped app right :width="chatWidth" mobile-break-point="780">
-      <v-layout column fill-height>
-        <v-layout row align-center>
-          <span class="subheading my-2 ml-3">Chat</span>
-          <v-spacer></v-spacer>
-          <v-menu bottom left allow-overflow text-xs-right max-height="70%">
-            <template v-slot:activator="{ on }">
-              <v-btn icon v-on="on">
-                <v-icon>list</v-icon>
-              </v-btn>
-            </template>
-            <v-card width="250">
-              <v-flex pt-3 pb-2 pl-3><span class="font-weight-bold body-2">Users</span></v-flex>
-              <v-flex>
-                <table>
-                  <tr v-for="(user, index) in users" :key="user.id">
-                    <td
-                      class="pl-3"
-                      :class="index === users.length - 1 ? 'pb-3' : 'pb-1'"
-                      style="word-wrap:break-word;"
-                      v-text="user.name"
-                    ></td>
-                  </tr>
-                </table>
-              </v-flex>
-            </v-card>
-          </v-menu>
-        </v-layout>
-        <v-divider></v-divider>
-        <v-flex id="chat-area" xs12 pa-1 ma-1 style="overflow-y: auto;">
-          <div v-for="(mess, index) in messages" :key="index" class="px-1">
-            <p>
-              <strong style="word-wrap:break-word;">{{ mess.user.name }}</strong
-              >:
-              <span style="word-wrap:break-word;">{{ mess.text }}</span>
-            </p>
-          </div>
-        </v-flex>
-        <v-divider></v-divider>
-        <v-layout column justify-end xs12 ma-2>
-          <v-textarea
-            v-model="message"
-            placeholder="message"
-            solo
-            no-resize
-            rows="3"
-            hide-details
-            @keypress="sendMessageFlag = true"
-            @keyup.enter="sendMessage"
-          ></v-textarea>
-          <v-flex text-xs-right pt-1>
-            <span class="body-1" :style="message.length > 200 ? 'color: red;' : ''">{{ message.length }}/200</span>
-            <v-btn small color="primary" :disabled="message.length > 200" @click="clickSend">Send</v-btn>
-          </v-flex>
-        </v-layout>
-      </v-layout>
+    <v-navigation-drawer v-if="chatDrawer" fixed clipped app right width="330" mobile-break-point="780">
+      <chat :users="users" :messages="messages" :rows="3" @emit-message="sendMessage"></chat>
     </v-navigation-drawer>
     <!-- right drawer -->
     <!-- player area -->
@@ -214,12 +160,23 @@
         <span class="pl-2 white--text">ツイート</span>
       </v-btn>
     </v-layout>
+    <template v-if="!chatDrawer">
+      <chat
+        id="mobile-chat"
+        :users="users"
+        :messages="messages"
+        :rows="1"
+        :style="`height: calc(100% - ${top}px + 30px)`"
+        @emit-message="sendMessage"
+      ></chat>
+    </template>
   </v-container>
 </template>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 import io from 'socket.io-client'
+import Chat from '~/components/chat'
 
 export default {
   validate({ params }) {
@@ -227,6 +184,9 @@ export default {
     return params.roomId.length <= 100 && pattern.test(params.roomId)
   },
   layout: 'layout',
+  components: {
+    Chat
+  },
   data() {
     return {
       protocol: null,
@@ -242,8 +202,6 @@ export default {
         name: this.$store.state.user
       },
       users: [],
-      message: '',
-      sendMessageFlag: false,
       messages: [],
       videoURL: '',
       videoQueue: [],
@@ -257,7 +215,8 @@ export default {
       },
       mini: false,
       queueWidth: 320,
-      chatWidth: 330
+      chatDrawer: true,
+      top: 0
     }
   },
   computed: {
@@ -268,6 +227,10 @@ export default {
   created() {
     if (this.$store.state.user === null) {
       this.dialog = true
+    }
+    if (this.$store.state.windowSize < 450) {
+      this.chatDrawer = false
+      this.getTop()
     }
   },
   mounted() {
@@ -282,13 +245,14 @@ export default {
       (newValue, oldValue) => {
         if (780 < newValue && newValue < 1264) {
           this.mini = true
+          this.chatDrawer = true
         } else if (newValue < 450) {
           this.queueWidth = 280
-          this.chatWidth = 290
+          this.chatDrawer = false
         } else {
           this.mini = false
           this.queueWidth = 320
-          this.chatWidth = 330
+          this.chatDrawer = true
         }
       }
     )
@@ -370,29 +334,18 @@ export default {
       this.sendMessageFlag = true
       this.sendMessage()
     },
-    sendMessage() {
-      if (!this.message.trim() || this.message.trim().length > 200 || !this.sendMessageFlag) {
-        this.sendMessageFlag = false
-        return
-      }
-      // メッセージオブジェクトを作る
+    sendMessage(text) {
       const message = {
         user: {
           name: this.room.name,
           id: this.socket.id
         },
         date: this.now,
-        text: this.message.trim()
+        text: text.trim()
       }
-
-      // 自身（Vueインスタンス）のデータオブジェクトにメッセージを追加する
       this.messages.push(message)
-      // サーバー側にメッセージを送信する
       this.socket.emit('send-message', message)
       this.scrollChat()
-      // input要素を空にする
-      this.message = ''
-      this.sendMessageFlag = false
     },
     scrollChat(flag = '') {
       this.$nextTick(() => {
@@ -437,6 +390,12 @@ export default {
     },
     pauseVideo() {
       this.socket.emit('pause-video')
+    },
+    getTop() {
+      if (process.client) {
+        const mobilechat = document.getElementById('mobile-chat')
+        this.top = mobilechat.getBoundingClientRect().top
+      }
     }
   }
 }

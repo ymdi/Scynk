@@ -51,14 +51,20 @@
                     </span>
                   </v-layout>
                 </v-list-tile-title>
-                <v-list-tile-sub-title>{{ currentVideo.duration }}&nbsp;</v-list-tile-sub-title>
+                <v-list-tile-sub-title>
+                  <v-layout row align-baseline>
+                    <v-flex>{{ currentVideo.duration }}</v-flex>
+                    <v-flex
+                      v-if="currentVideo.user !== undefined && currentVideo.user.name !== ''"
+                      text-truncate
+                      text-xs-right
+                      ml-4
+                    >
+                      added by {{ currentVideo.user.name }}
+                    </v-flex>
+                  </v-layout>
+                </v-list-tile-sub-title>
               </v-list-tile-content>
-              <v-list-tile-action style="width: 20px;min-width: 30px !important;">
-                <v-flex></v-flex>
-                <v-list-tile-action-text v-if="currentVideo.user !== undefined && currentVideo.user.name !== ''">
-                  added by {{ currentVideo.user.name }}
-                </v-list-tile-action-text>
-              </v-list-tile-action>
             </v-list-tile>
           </v-list>
         </v-flex>
@@ -81,7 +87,7 @@
           <v-list two-line dense>
             <template v-for="(video, index) in videoQueue">
               <div :key="index">
-                <v-list-tile>
+                <v-list-tile class="pb-2">
                   <v-list-tile-content>
                     <v-list-tile-title>
                       <v-layout row align-center>
@@ -93,12 +99,16 @@
                         </a>
                       </v-layout>
                     </v-list-tile-title>
-                    <v-list-tile-sub-title>{{ video.duration }}&nbsp;</v-list-tile-sub-title>
+                    <v-list-tile-sub-title>
+                      <v-layout row align-baseline>
+                        <v-flex>{{ video.duration }}</v-flex>
+                        <v-flex text-truncate text-xs-right ml-4>added by {{ video.user.name }}</v-flex>
+                      </v-layout>
+                    </v-list-tile-sub-title>
                   </v-list-tile-content>
                   <v-list-tile-action style="width: 20px;min-width: 30px !important;">
                     <v-flex></v-flex>
                     <v-list-tile-action-text>
-                      <span class="pr-1">added by {{ video.user.name }}</span>
                       <v-icon size="15" color="primary" @click="removeVideo(index)">fas fa-trash-alt</v-icon>
                     </v-list-tile-action-text>
                   </v-list-tile-action>
@@ -144,7 +154,7 @@
         <v-flex id="chat-area" xs12 pa-1 ma-1 style="overflow-y: auto;">
           <div v-for="(mess, index) in messages" :key="index" class="px-1">
             <p>
-              <strong>{{ mess.user.name }}</strong
+              <strong style="word-wrap:break-word;">{{ mess.user.name }}</strong
               >:
               <span style="word-wrap:break-word;">{{ mess.text }}</span>
             </p>

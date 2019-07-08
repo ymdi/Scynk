@@ -16,11 +16,11 @@
               ></v-text-field>
               <v-text-field
                 v-model="roomId"
-                :rules="[rules.roomId, rules.counter]"
+                :rules="[rules.characters, rules.counter]"
                 label="Room ID(default : scynchro)"
                 @keypress.enter="enterRoom"
               ></v-text-field>
-              <v-btn :disabled="!valids()" block color="primary" @click="enterRoom">
+              <v-btn :disabled="!validateForm()" block color="primary" @click="enterRoom">
                 Enter
               </v-btn>
             </v-form>
@@ -63,7 +63,7 @@ export default {
       roomId: '',
       rules: {
         required: value => !!value || 'Required.',
-        roomId: value => {
+        characters: value => {
           const pattern = /^[ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]*$/
           return pattern.test(value) || 'Special characters are not allowed.'
         },
@@ -72,12 +72,12 @@ export default {
     }
   },
   methods: {
-    valids() {
+    validateForm() {
       const rules = this.rules
       if (!this.name.trim()) {
         return false
       }
-      if (rules.roomId(this.roomId) !== true) {
+      if (rules.characters(this.roomId) !== true) {
         return false
       }
       if (rules.counter(this.name) !== true || rules.counter(this.roomId) !== true) {
@@ -86,7 +86,7 @@ export default {
       return true
     },
     enterRoom() {
-      if (!this.valids()) {
+      if (!this.validateForm()) {
         return
       }
       if (!this.roomId) {

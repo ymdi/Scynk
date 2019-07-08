@@ -214,7 +214,7 @@ import io from 'socket.io-client'
 export default {
   validate({ params }) {
     const pattern = /^[ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]*$/
-    return pattern.test(params.roomId)
+    return params.roomId.length <= 100 && pattern.test(params.roomId)
   },
   layout: 'layout',
   data() {

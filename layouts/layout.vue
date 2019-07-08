@@ -52,7 +52,7 @@ export default {
       menu: [
         { title: 'Join room', icon: 'fas fa-door-open', link: '/' },
         { title: 'Source', icon: 'fab fa-github', link: 'https://github.com/ymdi/Scynchro' },
-        { title: 'Contact', icon: 'fab fa-twitter', link: 'https://twitter.com/sababread' }
+        { title: 'Contact', icon: 'fab fa-twitter', link: 'https://twitter.com/ymdi_' }
       ]
     }
   },

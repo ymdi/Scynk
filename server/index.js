@@ -124,13 +124,12 @@ async function start() {
           })
         }
         if (obj.provider === 'twitch') {
+          const header = {'Client-ID': process.env.Twitch_API_KEY}
 
           if (obj.type === 'stream') {
             let userid = ''
             return await axios.get('https://api.twitch.tv/helix/users', {
-              headers: {
-                'Client-ID': process.env.Twitch_API_KEY
-              },
+              hearders: header,
               params: {
                 login: obj.id
               }
@@ -138,9 +137,7 @@ async function start() {
               userid = res.data.data[0].id
 
               return axios.get('https://api.twitch.tv/helix/streams', {
-                headers: {
-                  'Client-ID': process.env.Twitch_API_KEY
-                },
+                hearders: header,
                 params: {
                   user_id: userid
                 }
@@ -149,9 +146,7 @@ async function start() {
           }
 
           return await axios.get(`https://api.twitch.tv/helix/${obj.type}s`, {
-            headers: {
-              'Client-ID': process.env.Twitch_API_KEY
-            },
+            hearders: header,
             params: {
               id: obj.type !== 'stream' ? obj.id : ''
             }
@@ -160,7 +155,7 @@ async function start() {
       }
 
       getData(obj).then((res) => {
-        // console.log(res.data.data[0])
+        console.log(res.data)
         if (obj.provider === 'youtu') {
           const data = res.data.items[0]
           video.title = data.snippet.title
@@ -182,7 +177,7 @@ async function start() {
         roomList[roomId].videoQueue.push(video)
         io.in(roomId).emit('new-video', video)
       }).catch(err => {
-        console.log(JSON.stringify(err.response.data))
+        console.log(JSON.stringify(err,null,2))
       })
     })
 

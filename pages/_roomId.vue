@@ -148,9 +148,9 @@
     <v-layout row>
       <v-btn
         :href="
-          `https://twitter.com/intent/tweet?hashtags=scynchro&ref_src=twsrc%5Etfw&text=${
+          `https://twitter.com/intent/tweet?hashtags=scynk&ref_src=twsrc%5Etfw&text=${
             room.id
-          }で動画再生中！&tw_p=tweetbutton&url=https://scynchro.herokuapp.com/${room.id}`
+          }で動画再生中！&tw_p=tweetbutton&url=https://scynk.herokuapp.com/${room.id}`
         "
         target="_blank"
         color="#1da1f2"

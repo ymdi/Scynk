@@ -24,7 +24,7 @@
     "js-cookie": "^2.2.0",
     "moment": "^2.24.0",
     "moment-duration-format": "^2.3.2",
-    "nuxt": "^2.6.0",
+    "nuxt": "^2.15.8",
     "socket.io": "^2.2.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.2",
@@ -59,6 +59,6 @@
     "prettier": "^1.16.4",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
-    "vue-jest": "^3.0.3"
+    "vue-jest": "^4.0.1"
   }
 }
